@@ -1,0 +1,27 @@
+Metadata-Version: 2.0
+Name: dms2dec
+Version: 0.1
+Summary: DMS to decimal. Convert degrees minutes seconds to decimal latitude/longitude
+Home-page: UNKNOWN
+Author: 
+Author-email: 
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3
+Description-Content-Type: text/markdown
+
+# Convert DMS to Decimal.
+
+# Usage
+
+```
+from dms2dec.dms_convert import dms2dec
+
+dms2dec('''36°44'47.69"N''') # converts to dec
+dms2dec('''3° 2'33.53"E''') # converts to dec
+```
+
+

@@ -1,0 +1,12 @@
+./nationalparks/secrets.py
+*.pyc
+nationalparks/secrets.py
+*.wsgi
+nationalparks/nationalparks/secrets.py
+*.pyc
+nationalparks/app/views.py.orig
+nationalparks/app/views.pyc
+nationalparks/.DS_Store
+.DS_Store
+nationalparks/parkpic.ini
+/TODO
