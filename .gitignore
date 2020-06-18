@@ -11,3 +11,5 @@ nationalparks/.DS_Store
 nationalparks/parkpic.ini
 /TODO
 env
+*/__pycache__
+*/.ipynb_checkpoints/
