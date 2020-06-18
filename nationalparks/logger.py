@@ -13,7 +13,6 @@ import uuid
 from datetime import date, datetime
 import pandas as pd
 
-
 ## create path for logs if needed
 if not os.path.exists(os.path.join("..","logs")):
     os.mkdir(os.path.join("..","logs"))

@@ -1,0 +1,6 @@
+unique_id,timestamp,park_count,headers
+54b7d5db-f0d0-47b4-b2e5-14726ad6a8ee,2020_06_16_20_31_13,"['parkcode', 'parkname', 'state', 'latitude', 'longitude', 'date', 'surface_acres', 'surface_km2', 'visitors', 'description']",62
+25cca997-d87e-4d2b-832a-33b53579e0e3,2020_06_17_20_47_32,"['parkname', 'state', 'latitude', 'longitude', 'date', 'surface_acres', 'surface_km2', 'visitors', 'description']",62
+d76f4b42-a7b5-4c74-bdf6-3d1f296c1a9b,2020_06_17_20_48_43,"['parkname', 'state', 'latitude', 'longitude', 'date', 'surface_acres', 'surface_km2', 'visitors', 'description', 'parkunit']",62
+e966efc1-a6fe-4cbf-9147-45ac791ebaa0,2020_06_17_20_55_08,"['parkname', 'state', 'latitude', 'longitude', 'date', 'surface_acres', 'surface_km2', 'visitors', 'description', 'parkunit']",62
+e5a85586-52aa-4d8c-bf42-778ebb2f475a,2020_06_17_21_06_55,"['parkname', 'state', 'latitude', 'longitude', 'date', 'surface_acres', 'surface_km2', 'visitors', 'description', 'parkunit', 'boundaries']",62

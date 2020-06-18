@@ -8,6 +8,7 @@ import urllib.request
 import re
 import os, sys
 import pandas as pd
+import json
 sys.path.append('..')
 from dms2dec.dms_convert import dms2dec
 
@@ -51,6 +52,12 @@ def scrap_park_data():
         
         ## find park name
         np = tr.find_all("a")[0].get('title')
+
+        ## clean park name
+        np = np.replace('ʻ', '')
+        np = np.replace('ā', 'a')
+        np = np.replace('–', '-')
+
         parks.append(np)
         data[np] = {}
     
@@ -92,4 +99,30 @@ def scrap_park_data():
     ## create dataframe
     parks = pd.DataFrame(data).T.reset_index()
 
+    ## read park units
+    units = pd.read_csv("../scrapper/data/Parks.csv")
+    
+    ## merge
+    parks = pd.merge(left=parks, right=units, left_on='index', right_on='parkname')
+    del parks['parkname']
+
+    ## rename columns
+    parks = parks.rename(columns={"index": "parkname"})
+
+    ## get topo
+    parks['boundaries'] = parks['parkunit'].apply(lambda x: get_topo_json(x))
+
     return parks
+
+def get_topo_json(parkunit):
+    path = '../scrapper/data/json/'+parkunit+'.topojson'
+    if os.path.exists(path):
+        with open(path, 'r') as file:
+            topojson = file.read().replace('\n', '')
+    else:
+        raise Exception("topojson file not found.")
+    
+    return topojson
+
+if __name__ == "__main__":
+    df = scrap_park_data()
