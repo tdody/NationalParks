@@ -29,7 +29,10 @@ class Park():
         self.visitors = result['visitors']
         self.description = result['description']
         ## photos
-        ## boundaries
+        self.boundaries = result['boundaries']
+
+    def show_park(self):
+        
     
     def photos(self):
         query = {

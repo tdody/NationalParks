@@ -110,19 +110,30 @@ def scrap_park_data():
     parks = parks.rename(columns={"index": "parkname"})
 
     ## get topo
-    parks['boundaries'] = parks['parkunit'].apply(lambda x: get_topo_json(x))
+    parks['boundaries'] = parks['parkunit'].apply(lambda x: get_geojson(x))
 
     return parks
 
-def get_topo_json(parkunit):
-    path = '../scrapper/data/json/'+parkunit+'.topojson'
+def get_geojson(parkunit):
+    path = '../scrapper/data/geojson/'+parkunit+'.geojson'
     if os.path.exists(path):
         with open(path, 'r') as file:
-            topojson = file.read().replace('\n', '')
+            geojson = file.read().replace('\n', '')
     else:
-        raise Exception("topojson file not found.")
-    
-    return topojson
+        raise Exception("geojson file not found.")
+    return geojson
 
 if __name__ == "__main__":
     df = scrap_park_data()
+
+
+    import os
+    from shutil import copyfile
+
+    for index, row in df.iterrows():
+        path = "./data/full/"+row['parkunit']+".geojson"
+        target = "./data/geojson/"+row['parkunit']+".geojson"
+        if os.path.isfile("./data/full/"+row['parkunit']+".geojson"):
+            copyfile(path, target)
+        else:
+            print(row['parkunit'], 'missing...')
