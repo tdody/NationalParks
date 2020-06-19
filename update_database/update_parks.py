@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Update National Parks database
+Updates National Parks database
 """
 import os, sys
 sys.path.append('..')
