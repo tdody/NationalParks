@@ -16,7 +16,7 @@ NP_LINK = "https://en.wikipedia.org/wiki/List_of_national_parks_of_the_United_St
 
 def scrap_park_data():
     """
-    Extract National Parks data from https://en.wikipedia.org/wiki/List_of_national_parks_of_the_United_States?oldformat=true
+    Extracts National Parks data from https://en.wikipedia.org/wiki/List_of_national_parks_of_the_United_States?oldformat=true
     
     Saves a csv file containing:
         - Park name
@@ -111,11 +111,12 @@ def scrap_park_data():
 
     ## get topo
     parks['boundaries'] = parks['parkunit'].apply(lambda x: get_geojson(x))
+    parks['bbox'] = parks['parkunit'].apply(lambda x: get_bbox(x))
 
     return parks
 
 def get_geojson(parkunit):
-    path = '../scrapper/data/geojson/'+parkunit+'.geojson'
+    path = '../scrapper/data/geojson/' + parkunit + '.geojson'
     if os.path.exists(path):
         with open(path, 'r') as file:
             geojson = file.read().replace('\n', '')
@@ -123,9 +124,23 @@ def get_geojson(parkunit):
         raise Exception("geojson file not found.")
     return geojson
 
+def get_bbox(parkunit):
+    path = '../scrapper/data/topojson/' + parkunit + '.topojson'
+    if os.path.exists(path):
+        with open(path, 'r') as file:
+            topojson = file.read()
+            topojson = json.loads(topojson)
+            bbox = {
+                'min_longitude':topojson['bbox'][0],
+                'min_latitude':topojson['bbox'][1],
+                'max_longitude':topojson['bbox'][2],
+                'max_latitude':topojson['bbox'][3]
+                }
+            return bbox
+    else:
+        raise Exception("topojson file not found.")
 if __name__ == "__main__":
     df = scrap_park_data()
-
 
     import os
     from shutil import copyfile
