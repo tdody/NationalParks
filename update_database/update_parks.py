@@ -34,4 +34,4 @@ if __name__ == "__main__":
     ## update parks
     update_parks()
 
-    print("...Park data updated")
+    print("... Park data updated")
