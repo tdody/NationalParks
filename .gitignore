@@ -1,8 +1,11 @@
 ./nationalparks/secrets.py
-*.pyc
 nationalparks/secrets.py
-*.wsgi
 nationalparks/nationalparks/secrets.py
+
+*.pyc
+
+*.wsgi
+
 *.pyc
 nationalparks/app/views.py.orig
 nationalparks/app/views.pyc
@@ -13,3 +16,4 @@ nationalparks/parkpic.ini
 env
 */__pycache__
 */.ipynb_checkpoints/
+./data/*

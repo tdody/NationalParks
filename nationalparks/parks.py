@@ -7,6 +7,7 @@ import nationalparks as np
 import json
 import folium
 import shapely.geometry
+import pandas as pd
 
 class Parks():
     """
@@ -32,10 +33,31 @@ class Park():
         self.surface_km2 = result['surface_km2']
         self.visitors = result['visitors']
         self.description = result['description']
-        ## photos
+        ## boundaries
         self.boundaries = json.loads(result['boundaries'])
         self.bbox = result['bbox']
         self.bbox_points = self.__get_bbox_points()
+        self.polygons = self.__get_polygons()
+        ## photos
+        
+
+    def __get_polygons(self):
+        '''
+        '''
+        polygons = []
+
+        if "features" in self.boundaries:
+            i = 0
+            for group in self.boundaries['features']:
+                for polygon in group['geometry']['coordinates']:
+                    data = {"type": "Polygon", "coordinates": [polygon]}
+                    polygons.append(shapely.geometry.asShape(data))
+            return polygons
+        else:
+            for polygon in self.boundaries['geometry']['coordinates']:
+                data = {"type": "Polygon", "coordinates": [polygon]}
+                polygons.append(shapely.geometry.asShape(data))
+            return polygons
 
     def in_park(self, photo):
         '''
@@ -46,18 +68,14 @@ class Park():
         of the park
         '''
         ## create point of interest
-        point = shapely.geometry.Point(photo['longitude'], photo['latitude'])
+        point = shapely.geometry.Point(float(photo['longitude']), float(photo['latitude']))
         ## set tolerance and result
-        is_in = False
         tolerance = self.__get_tolerance()
         ## iterate over every polygons
-        for polygon in self.boundaries['geometry']['coordinates']:
-            ## create a temporary geojson dictionary
-            data = {"type": "Polygon", "coordinates": [polygon]}
-            shape = shapely.geometry.asShape(data)
-            if shape.contains(point):
+        for polygon in self.polygons:
+            if polygon.contains(point):
                 return True
-            if shape.distance(point) <= tolerance:
+            if polygon.distance(point) <= tolerance:
                 return True
         return False
 
@@ -106,6 +124,21 @@ class Park():
         return min(lat_diff, lon_diff) / 500.
 
     def get_photos(self):
+        '''
+        Query photos of park from database
+        '''
         query = {
-            ''
+            'parkunit': self.parkunit,
         }
+
+        photos = list(np.db.photos.find(query))
+        
+        df = pd.DataFrame(photos)
+
+        return df
+
+    def get_photo_count(self):
+        '''
+        Return the number of images taken in the park.
+        '''
+        return self.get_photos()['_id'].count()

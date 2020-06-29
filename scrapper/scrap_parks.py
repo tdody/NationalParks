@@ -139,16 +139,6 @@ def get_bbox(parkunit):
             return bbox
     else:
         raise Exception("topojson file not found.")
+
 if __name__ == "__main__":
     df = scrap_park_data()
-
-    import os
-    from shutil import copyfile
-
-    for index, row in df.iterrows():
-        path = "./data/full/"+row['parkunit']+".geojson"
-        target = "./data/geojson/"+row['parkunit']+".geojson"
-        if os.path.isfile("./data/full/"+row['parkunit']+".geojson"):
-            copyfile(path, target)
-        else:
-            print(row['parkunit'], 'missing...')
