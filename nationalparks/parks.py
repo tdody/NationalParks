@@ -16,14 +16,17 @@ class Parks():
     def __init__(self):
         pass
 
+    def get_all_parkunits(self):
+        return np.db.parks.find().distinct('parkunit')
+
 class Park():
     """
     Park object
     """
-    def __init__(self, index):
+    def __init__(self, parkunit):
         ## fetch park info
-        result = np.db.parks.find_one({'parkunit':index})
-        self.parkunit = index
+        result = np.db.parks.find_one({'parkunit':parkunit})
+        self.parkunit = parkunit
         self.parkname = result['parkname']
         self.state = result['state']
         self.latitude = result['latitude']
@@ -39,8 +42,7 @@ class Park():
         self.bbox_points = self.__get_bbox_points()
         self.polygons = self.__get_polygons()
         ## photos
-        
-
+    
     def __get_polygons(self):
         '''
         '''
@@ -125,7 +127,7 @@ class Park():
 
     def get_photos(self):
         '''
-        Query photos of park from database
+        Queries photos of park from database
         '''
         query = {
             'parkunit': self.parkunit,
@@ -134,11 +136,13 @@ class Park():
         photos = list(np.db.photos.find(query))
         
         df = pd.DataFrame(photos)
+        df = df.set_index('id', drop=True)
 
         return df
 
     def get_photo_count(self):
         '''
-        Return the number of images taken in the park.
+        Returns the number of photos taken in the park.
         '''
         return self.get_photos()['_id'].count()
+
