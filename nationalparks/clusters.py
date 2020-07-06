@@ -15,6 +15,11 @@ import numpy
 
 
 class Clusters():
+    '''
+
+    '''
+
+
     def __init__(self, parkunit):
         self.park = np.parks.Park(parkunit)
 
@@ -25,7 +30,7 @@ class Clusters():
         '''
         Performs DBSCAN clustering of images based on latitude and longitude
         '''
-        if verbose: print("..." + self.park.parkname)
+        if verbose: print("... " + self.park.parkname + " (" + self.park.parkunit + ")")
         ## get all photos
         df_photos = self.park.get_photos()
         ## sort by latitude and longitude
@@ -46,7 +51,21 @@ class Clusters():
         best_score = -1
         best_eps = 0
         ## create a set of candidate values for eps based on quantile distribution of the distance between points
-        range_eps = df_geo[~df_geo['distance'].isnull()]['distance'].quantile([0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.675,0.70,0.75])
+        range_eps = df_geo[~df_geo['distance'].isnull()]['distance'].quantile([0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.675,0.70,0.75,0.8,0.825,0.85,0.875,0.90,0.925,0.95,0.975,0.98,0.99,0.995])
+        
+        if df_geo.shape[0]<=100:
+            min_cluster_count = 2
+            max_cluster_count = 5
+        elif df_geo.shape[0]<=1000:
+            min_cluster_count = 5
+            max_cluster_count = 50
+        elif df_geo.shape[0]<=10000:
+            min_cluster_count= 30
+            max_cluster_count = 500
+        else:
+            min_cluster_count = 40
+            max_cluster_count = 500
+
         for i in range_eps:
             if i==0:
                 continue
@@ -56,11 +75,20 @@ class Clusters():
             db = DBSCAN(eps=i, min_samples=5, n_jobs=-1).fit(df_geo[['latitude', 'longitude']]) 
             labels = db.labels_
             ## compute silhouette score
-            silhouette_avg = silhouette_score(df_geo[['longitude', 'latitude']], labels)
-            if verbose: print("   ...eps={:.5f}, silhouette={:.3f}, cluster count={}".format(i,silhouette_avg,len(set(labels))))
-            if best_score < silhouette_avg and len(set(labels))>=40:
-                best_score = silhouette_avg
-                best_eps = i
+            if len(set(labels))>=min_cluster_count and len(set(labels))<=max_cluster_count:
+                if min_cluster_count==1 and len(set(labels))==1 and best_score==-1:
+                    print("   For eps value = "+str(i), "\n   Number of clusters: {}".format(len(set(labels))))
+                    best_eps = i
+                else:
+                    silhouette_avg = silhouette_score(df_geo[['longitude', 'latitude']], labels)
+                    print("   For eps value: "+str(i), ", quantile: {:.5f}".format(i), "\n      Number of clusters: {}".format(len(set(labels))),
+                    "\n      Avg silhouette score is: {:.4f}".format(silhouette_avg))
+                if best_score < silhouette_avg:
+                    print("      => Improved")
+                    best_score = silhouette_avg
+                    best_eps = i
+            else:
+                print("   eps: {:.5f} out of cluster bounds".format(i))
         
         ## min_samples
         best_score = -1
@@ -71,11 +99,18 @@ class Clusters():
             db = DBSCAN(eps=best_eps, min_samples=i, n_jobs=-1).fit(df_geo[['longitude', 'latitude']])
             labels = db.labels_
             ## compute silhouette score
-            silhouette_avg = silhouette_score(df_geo[['longitude', 'latitude']], labels)
-            if verbose: print("   ...eps={:.5f}, min samples={}, silhouette={:.3f}, cluster count={}".format(best_eps,i,silhouette_avg,len(set(labels))))
-            if best_score < silhouette_avg and len(set(labels))>=40:
-                best_score = silhouette_avg
-                best_min_samples = i
+            if len(set(labels)) >= min_cluster_count:
+                if min_cluster_count==1 and len(set(labels))==1 and best_score==-1 and best_min_samples==0:
+                    print("   For eps value = "+str(i), "\n   Number of clusters: {}".format(len(set(labels))))
+                    best_min_samples=i
+                else:
+                    silhouette_avg = silhouette_score(df_geo[['longitude', 'latitude']], labels)
+                    print("   For min_sample value = "+str(i), "\n      Number of clusters: {}".format(len(set(labels))),
+                    "\n      Avg silhouette score is: {:.4f}".format(silhouette_avg))
+                    if best_score < silhouette_avg and len(set(labels))>=min_cluster_count:
+                        print("      => Improved")
+                        best_score = silhouette_avg
+                        best_min_samples = i
         
         ## train final DBSCAN
         db = DBSCAN(eps=best_eps, min_samples=best_min_samples, n_jobs=-1).fit(df_geo[['longitude', 'latitude']])
@@ -90,9 +125,7 @@ class Clusters():
         del df_geo['latitude_diff']
         del df_geo['longitude_diff']
 
-        return df_geo, db.labels_.max() + 1
-
-
+        return df_geo, db.labels_.max() + 1, best_eps, best_min_samples
 
     def get_DBSCAN():
         pass
