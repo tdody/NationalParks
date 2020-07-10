@@ -3,11 +3,15 @@
 Parks and Park objects
 """
 
-import nationalparks as np
+import nationalparks as usnp
 import json
 import folium
 import shapely.geometry
 import pandas as pd
+import geopandas as gpd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import os
 
 class Parks():
     """
@@ -17,7 +21,7 @@ class Parks():
         pass
 
     def get_all_parkunits(self):
-        return np.db.parks.find().distinct('parkunit')
+        return usnp.db.parks.find().distinct('parkunit')
 
 class Park():
     """
@@ -25,7 +29,7 @@ class Park():
     """
     def __init__(self, parkunit):
         ## fetch park info
-        result = np.db.parks.find_one({'parkunit':parkunit})
+        result = usnp.db.parks.find_one({'parkunit':parkunit})
         self.parkunit = parkunit
         self.parkname = result['parkname']
         self.state = result['state']
@@ -133,7 +137,7 @@ class Park():
             'parkunit': self.parkunit,
         }
 
-        photos = list(np.db.photos.find(query))
+        photos = list(usnp.db.photos.find(query))
         
         df = pd.DataFrame(photos)
         df = df.set_index('id', drop=True)
@@ -145,4 +149,30 @@ class Park():
         Returns the number of photos taken in the park.
         '''
         return self.get_photos()['_id'].count()
+
+    def plot_all_photos(self, color_clusters=True):
+        '''
+        Returns a plot showing the location of all the photos taken within the park boundaries.
+        '''
+
+        ## create figure
+        fig, ax = plt.subplots(figsize=(12,12))
+
+        ## get geojson data
+        df_boundaries = gpd.read_file(os.path.join('../scrapper/data/geojson', self.parkunit + '.geojson'))
+        df_boundaries.plot(alpha=0.2, ax=ax, color='grey')
+
+        ## get photos
+        df_photos = self.get_photos()
+        top_labels = set(pd.Series(df_photos['labels']).value_counts().index.to_list())
+
+        ## plot photos
+        if color_clusters:
+            sns.scatterplot(x='longitude', y='latitude', data=df_photos, hue='labels', alpha=0.3, linewidth=0, palette=sns.color_palette("muted", n_colors=len(top_labels)))
+        else:
+            sns.scatterplot(x='longitude', y='latitude', data=df_photos, alpha=0.1, linewidth=0, ax=ax)
+        ax.set_title(self.parkname + ": {} photos".format(df_photos.shape[0]))
+
+        return ax
+
 

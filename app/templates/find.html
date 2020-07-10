@@ -1,0 +1,39 @@
+{% extends "base.html" %} {% block content %}
+<br><br><br><br><br><br><br><br>
+<div class="container">
+    <div id="frontlogo">
+        <img src="static/images/large.png" style="width:40%" class="center">
+    </div>
+    <h1 class="text-muted" style="text-align: center;"><span style="color: rgb(11, 75, 79)">usparks</span><span style="color: #dd872a">.io</span></h1>
+
+    <br><br><br>
+    <div id="whichpark" style="text-align: center;">
+        <h4 class="text-muted" style=" font-size: 24px;">Pick an U.S. National Park to explore?</h4>
+    </div>
+    <div id="answer" class="text-muted">
+        {{message}}
+    </div>
+    <div id="input" class="input" style="text-align:center; vertical-align:middle">
+        {{ form.autocomp(placeholder="e.g. Yellowstone National Park") }}
+    </div>
+    <script>
+        $(function() {
+            $.ajax({
+                url: '{{ url_for("autocomplete") }}'
+            }).done(function(data) {
+                $('#city_autocomplete').autocomplete({
+                    source: data,
+                    minLength: 2,
+                    position: {
+                        my: "left top",
+                        at: "left bottom",
+                        collision: "none"
+                    }
+                });
+            });
+        });
+    </script>
+
+</div>
+
+{% endblock %}

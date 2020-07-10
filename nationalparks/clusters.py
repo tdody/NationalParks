@@ -3,7 +3,7 @@
 Clusters object
 """
 import pandas as pd
-import nationalparks as np
+import nationalparks as usnp
 from sklearn.cluster import DBSCAN
 from sklearn.metrics import silhouette_samples, silhouette_score
 import numpy
@@ -21,7 +21,7 @@ class Clusters():
 
 
     def __init__(self, parkunit):
-        self.park = np.parks.Park(parkunit)
+        self.park = usnp.parks.Park(parkunit)
 
     def DBSCAN(self):
         pass
@@ -129,5 +129,21 @@ class Clusters():
 
     def get_DBSCAN():
         pass
+
+    def jaccard_index(tags_cluster_1, tags_cluster_2):
+        '''
+        Returns the Jaccard Similarity Index between two cluster's tags
+        Inputs:
+            tags_cluster_1: list of tags (with potential duplicates) associated to cluster_1
+            tags_cluster_2: list of tags (with potential duplicates) associated to cluster_2
+        Outputs:
+            Jaccard Similarity Index between two cluster's tags
+        '''
+        
+        if len(set(tags_cluster_1)) == 0 and len(set(tags_cluster_2)) == 0:
+            return 0
+        else:
+            shared = len(set(tags_cluster_1).intersection(tags_cluster_2))
+            return shared / float(len(set(tags_cluster_1)) + len(set(tags_cluster_2)) - shared)
     
 
