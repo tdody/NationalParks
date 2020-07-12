@@ -23,11 +23,25 @@ class Parks():
     def get_all_parkunits(self):
         return usnp.db.parks.find().distinct('parkunit')
 
+    def is_park_in_db(self, parkname):
+        query = usnp.db.parks.find_one({'parkname':parkname})
+        if query:
+            return True
+        else:
+            return False
+
+    def parkname_to_parkunit(self, parkname):
+        query = usnp.db.parks.find_one({'parkname':parkname})
+        if query:
+            return query['parkunit']
+        return None
+
 class Park():
     """
     Park object
     """
     def __init__(self, parkunit):
+
         ## fetch park info
         result = usnp.db.parks.find_one({'parkunit':parkunit})
         self.parkunit = parkunit
@@ -40,13 +54,29 @@ class Park():
         self.surface_km2 = result['surface_km2']
         self.visitors = result['visitors']
         self.description = result['description']
+
         ## boundaries
         self.boundaries = json.loads(result['boundaries'])
         self.bbox = result['bbox']
         self.bbox_points = self.__get_bbox_points()
         self.polygons = self.__get_polygons()
+
+        ## websites
+        self.official_website = result['official_website']
+        self.alltrails_website = result['alltrails_website']
+        
         ## photos
+        self.photo_count = result['photo_count']
     
+        ## clusters
+        self.clusters = self.__get_clusters()
+    
+    def get_sw_ne(self):
+        return [
+            [self.bbox['min_latitude'],self.bbox['min_longitude']],
+            [self.bbox['max_latitude'],self.bbox['max_longitude']]
+            ]
+
     def __get_polygons(self):
         '''
         '''
@@ -175,4 +205,14 @@ class Park():
 
         return ax
 
+    def __get_clusters(self):
+        '''
+        Queries cluster information
+        '''
+        query = {
+            'parkunit': self.parkunit,
+        }
 
+        clusters = list(usnp.db.clusters.find(query))
+        df = pd.DataFrame(clusters)
+        return df

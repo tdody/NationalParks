@@ -78,3 +78,31 @@ th.style {
 img {
     max-width: 100%;
 }
+
+
+/* Create two equal columns that floats next to each other */
+
+.column_custom {
+    float: left;
+    width: 50%;
+    padding: 5px;
+    height: 300px;
+    /* Should be removed. Only for demonstration */
+}
+
+.row_custom {
+    width: 100%;
+}
+
+
+/* Clear floats after the columns */
+
+.row_custom:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+img.icon {
+    vertical-align: bottom;
+}

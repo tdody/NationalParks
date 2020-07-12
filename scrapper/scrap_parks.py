@@ -10,6 +10,7 @@ import os, sys
 import pandas as pd
 import json
 sys.path.append('..')
+import nationalparks as usnp
 from dms2dec.dms_convert import dms2dec
 
 NP_LINK = "https://en.wikipedia.org/wiki/List_of_national_parks_of_the_United_States?oldformat=true"
@@ -106,6 +107,15 @@ def scrap_park_data():
     parks = pd.merge(left=parks, right=units, left_on='index', right_on='parkname')
     del parks['parkname']
 
+    ## read park websites
+    websites = pd.read_csv('../scrapper/data/park_websites.csv')
+
+    ## merge
+    parks = pd.merge(left=parks, right=websites, on='parkunit')
+
+    ## count photos
+    parks['photo_count'] = parks['parkunit'].apply(get_photo_count)
+
     ## rename columns
     parks = parks.rename(columns={"index": "parkname"})
 
@@ -114,6 +124,15 @@ def scrap_park_data():
     parks['bbox'] = parks['parkunit'].apply(lambda x: get_bbox(x))
 
     return parks
+
+def get_photo_count(parkunit):
+    '''
+    Return the number of photos used for the clustering
+    '''
+    photos = list(usnp.db.photos.find({'parkunit': parkunit}))
+    df = pd.DataFrame(photos)
+    return df._id.count()
+
 
 def get_geojson(parkunit):
     path = '../scrapper/data/geojson/' + parkunit + '.geojson'
