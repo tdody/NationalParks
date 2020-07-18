@@ -5,19 +5,26 @@
     <meta charset="utf-8">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
     <meta name="description" content="National Park Visit">
     <meta name="author" content="TAD">
 
-    <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/small.png') }}">
 
     <!-- Bootstrap core CSS -->
-    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+
 
     <!-- Custom styles for this template -->
-    <link href="{{ url_for('static', filename='css/logo-nav.css') }}" rel="stylesheet">
+    <!-- <link href="{{ url_for('static', filename='css/logo-nav.css') }}" rel="stylesheet"> -->
 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/mycss.css') }}" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!-- Custom style for the footer -->
     <style>
         .footer {
@@ -39,7 +46,7 @@
 
 </body>
 
-<div class="footer">
+<div class="footer" style="font-size: 18px;">
     <p>&copy;
         <a href="https://tdody.github.io">
             <font color="white"> Thibault Dody </font>

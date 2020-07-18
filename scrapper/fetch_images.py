@@ -59,6 +59,7 @@ class FlickrImageFinder():
 
     def filter_images(self, erase=True, progress=False):
         '''
+        Eliminate photos not taken inside parks.
         '''
         ## store image counts for log
         image_counts = {}

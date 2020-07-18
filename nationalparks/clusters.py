@@ -8,27 +8,17 @@ from sklearn.cluster import DBSCAN
 from sklearn.metrics import silhouette_samples, silhouette_score
 import numpy
 
-'''
-
-'''
-
-
-
 class Clusters():
     '''
-
+    Train clustering model for all parks
     '''
-
 
     def __init__(self, parkunit):
         self.park = usnp.parks.Park(parkunit)
 
-    def DBSCAN(self):
-        pass
-
     def train_DBSCAN(self, verbose=True):
         '''
-        Performs DBSCAN clustering of images based on latitude and longitude
+        Performs DBSCAN clustering of images based on latitude and longitude.
         '''
         if verbose: print("... " + self.park.parkname + " (" + self.park.parkunit + ")")
         ## get all photos
@@ -127,12 +117,10 @@ class Clusters():
 
         return df_geo, db.labels_.max() + 1, best_eps, best_min_samples
 
-    def get_DBSCAN():
-        pass
-
     def jaccard_index(tags_cluster_1, tags_cluster_2):
         '''
         Returns the Jaccard Similarity Index between two cluster's tags
+        
         Inputs:
             tags_cluster_1: list of tags (with potential duplicates) associated to cluster_1
             tags_cluster_2: list of tags (with potential duplicates) associated to cluster_2
@@ -145,5 +133,17 @@ class Clusters():
         else:
             shared = len(set(tags_cluster_1).intersection(tags_cluster_2))
             return shared / float(len(set(tags_cluster_1)) + len(set(tags_cluster_2)) - shared)
-    
+
+    def get_clusters(self):
+        '''
+        Queries clusters of park from database
+        '''
+        query = {
+            'parkunit': self.parkunit,
+        }
+
+        my_clusters = list(usnp.db.clusters.find(query))
+        df = pd.DataFrame(my_clusters)
+        df = df.set_index('id', drop=True)
+        return df
 

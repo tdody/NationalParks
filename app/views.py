@@ -4,12 +4,15 @@ from app import app
 import pymongo
 import secrets as sec
 import nationalparks as usnp
-from wtforms import TextField, Form
+from wtforms import TextField, Form, SelectField
 import json
 import folium
 
 class SearchForm(Form):
     autocomp = TextField(None, id='park_autocomplete', description="TAD")
+
+class SelectForm(Form):
+    locationSelect = SelectField('location', choices=[])
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -20,7 +23,7 @@ def home():
 def map():
     return render_template('map.html')
 
-@app.route('/explore', methods=['GET', 'POST'])
+@app.route('/explore', methods=['GET'])
 def explore_park():
 
     ## retrieve infos
@@ -47,28 +50,22 @@ def explore_park():
     if cluster_count == 0:
         message = 'There are no locations to explore for this park.'
 
-    ## FOLIUM MAP
-    start_coords = (park.latitude, park.longitude)
-    folium_map = folium.Map(
-        location=start_coords,
-        tiles='OpenStreetMap',
-    )
-    ## OpenStreetMap, Stamen Terrain
-    folium_map.fit_bounds(park.get_sw_ne())
-
-    style_function = lambda x: {'fillColor': '#960808','fillOpacity': 0.2,'weight': 1, 'color':'#960808'}
-    ## add park contour
-    folium.GeoJson(
-        park.boundaries,
-        name='geojson',
-        style_function=style_function
-        ).add_to(folium_map)
-
-    ## add markers
-    for i, row in park.clusters.iterrows():
-        folium.Marker([row['latitude'], row['longitude']], popup=park.parkname, icon=folium.Icon(color='lightgray', icon='home', prefix='fa')).add_to(folium_map)
-
+    ## map
+    folium_map = park.show_park()
     folium_map.save('app/templates/map.html')
+
+    ## locations
+    form = SelectForm()
+    form.locationSelect.choices = [(parkname + '//' + str(i+1), 'Scene ' + str(i+1)) for i in range(cluster_count)]
+
+    ## selected clusters
+    cluster_rank = 1
+
+    ## get cluster id
+    cluster_id = clusters.loc[clusters['rank']==cluster_rank,'labels'].to_numpy()[0]
+
+    ## photos
+    photos = park.get_top_photos(int(cluster_id), n_photos=25)
 
     return render_template(
         "explore.html",
@@ -80,18 +77,74 @@ def explore_park():
         description=park.description,
         park_website=park.official_website,
         park_trails=park.alltrails_website,
-        message=message)
+        message=message,
+        form=form,
+        samples=photos,
+        cluster_rank=cluster_rank)
 
+@app.route('/update_cluster', methods=['GET','POST'])
+def update_cluster():
+    results = request.args.get('locationSelect')
+    results = results.split("//")
+    parkname = results[0]
+    cluster_rank = int(results[1])
+    print(parkname, cluster_rank)
+
+    ## create park object
+    parkunit = usnp.parks.parkname_to_parkunit(parkname)
+    park = usnp.Park(parkunit)
+    photo_count = park.photo_count
+
+    ## get cluster info
+    if photo_count > 0:
+        clusters = park.clusters
+        cluster_count = clusters.shape[0]
+    else:
+        clusters, cluster_count = 0, 0
+
+    message = 'Click a scene marker to explore.'
+    if cluster_count == 0:
+        message = 'There are no locations to explore for this park.'
+
+    ## map
+    folium_map = park.show_park()
+    folium_map.save('app/templates/map.html')
+
+    ## locations
+    form = SelectForm()
+    form.locationSelect.choices = [(parkname + '//' + str(i+1), 'Scene ' + str(i+1)) for i in range(cluster_count)]
+
+    ## get cluster id
+    cluster_id = clusters.loc[clusters['rank']==cluster_rank,'labels'].to_numpy()[0]
+
+    ## photos
+    photos = park.get_top_photos(int(cluster_id), n_photos=25)
+
+    return render_template(
+        "explore.html",
+        parkname=parkname,
+        state=park.state,
+        parkunit=parkunit,
+        photo_count="{:,}".format(photo_count),
+        cluster_count=cluster_count,
+        description=park.description,
+        park_website=park.official_website,
+        park_trails=park.alltrails_website,
+        message=message,
+        form=form,
+        samples=photos,
+        cluster_rank=cluster_rank)
+
+@app.route('/gallery')
+def gallery():
+    return render_template('find.html')
 
 @app.route('/about')
 def about():
     return render_template("about.html", message="")
-
 
 @app.route('/_autocomplete',methods=['GET'])
 def autocomplete():
     parks = list(usnp.db.parks.find().distinct('parkname'))
     sorted(parks)
     return Response(json.dumps(parks), mimetype='application/json')
-
-

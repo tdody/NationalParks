@@ -3,12 +3,12 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container">
         <a href="{{ url_for('home') }}">
-            <img src="{{ url_for('static', filename='img/medium.png') }}" width="60" alt=""></a>
-        <span style="color: rgb(11, 75, 79)">&nbsp;&nbsp;&nbsp;usparks</span><span style="color: #dd872a">.io</span>
+            <img src="{{ url_for('static', filename='img/medium.png') }}" width="30" alt=""></a>
+        <h1><span style="color: rgb(11, 75, 79)">&nbsp;&nbsp;&nbsp;usparks</span><span style="color: #dd872a">.io</span></h1>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
+        <div class="collapse navbar-collapse" id="navbarResponsive" style="font-size: 20px;">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item active">
                     <a class="nav-link" href="/">Home
@@ -25,10 +25,10 @@
 <!-- Page Content-->
 <br><br><br><br>
 <div class="container">
-    <div id="frontlogo">
-        <img src="static/img/large.png" style="width:30%" class="center">
+    <div id="logo">
+        <img src="static/img/large.png" style="width:20%;margin-left: 40%;margin-right: 40%;margin-top: 5%;">
     </div>
-    <h1 class="text-muted" style="text-align: center;"><span style="color: rgb(11, 75, 79)">usparks</span><span style="color: #dd872a">.io</span></h1>
+    <h1 style="text-align: center;font-size: 50px;"><span style="color: rgb(11, 75, 79)">usparks</span><span style="color: #dd872a">.io</span></h1>
 
     <br><br><br>
     <div id="whichpark" style="text-align: center;">
@@ -38,7 +38,7 @@
         <span style="color: #dd872a">{{message}}</span>
     </div>
     <form action="/explore" method="get" id="parksearch" name="parksearch">
-        <div id="input" class="input" style="text-align:center; vertical-align:middle">
+        <div id="input" class="input" style="text-align:center; vertical-align:middle;font-size: 20px;">
             {{ form.autocomp(placeholder="e.g. Yellowstone National Park") }}
         </div>
     </form>

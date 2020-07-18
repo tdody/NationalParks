@@ -2,7 +2,7 @@
 """
 Parks and Park objects
 """
-
+import pymongo
 import nationalparks as usnp
 import json
 import folium
@@ -12,6 +12,7 @@ import geopandas as gpd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
+import numpy as np
 
 class Parks():
     """
@@ -21,9 +22,20 @@ class Parks():
         pass
 
     def get_all_parkunits(self):
+        '''
+        Returns all park units (4 letters code).
+        '''
         return usnp.db.parks.find().distinct('parkunit')
 
     def is_park_in_db(self, parkname):
+        '''
+        Return True if park name is in database.
+
+        Input:
+            parkname (string) e.g. Acadia National Park
+        Output:
+            True/False
+        '''
         query = usnp.db.parks.find_one({'parkname':parkname})
         if query:
             return True
@@ -31,6 +43,14 @@ class Parks():
             return False
 
     def parkname_to_parkunit(self, parkname):
+        '''
+        Convert park name into park unit.
+        
+        Input:
+            parkname (string) e.g. Acadia National Park
+        Output:
+            parkunit (string) e.g. acad
+        '''
         query = usnp.db.parks.find_one({'parkname':parkname})
         if query:
             return query['parkunit']
@@ -70,8 +90,17 @@ class Park():
     
         ## clusters
         self.clusters = self.__get_clusters()
+
+        ## idf
+        self.idf = self.get_idf()
     
     def get_sw_ne(self):
+        '''
+        Returns list of south-west and north-east corner coordinates.
+        
+        Outputs:
+            [ [min_lat, min_lon], [max_lat, max_lon] ]
+        '''
         return [
             [self.bbox['min_latitude'],self.bbox['min_longitude']],
             [self.bbox['max_latitude'],self.bbox['max_longitude']]
@@ -79,11 +108,19 @@ class Park():
 
     def __get_polygons(self):
         '''
+        Formats the geojson used to store the park boundaries. This allows for the park boundaries to be
+        plotted using folium.
+
+        Output:
+            formatted json file
         '''
+
+        ## create storage for final output
         polygons = []
 
+        ## if features key exists then iterate over polygons contained in each feature
+        ## else only iterate over the polygons directly
         if "features" in self.boundaries:
-            i = 0
             for group in self.boundaries['features']:
                 for polygon in group['geometry']['coordinates']:
                     data = {"type": "Polygon", "coordinates": [polygon]}
@@ -101,7 +138,13 @@ class Park():
         This computation includes point that are within 1/500 of the length of the minimum
         of the width and the height of the park bounding box.
         This choice is made to limit the rejection of images that are located right on the boundary
-        of the park
+        of the park.
+
+        Input:
+            photo (pandas DataFrame row) contains the longitude and latitude features
+        
+        Output:
+            True/False whether photo coordinates are contained within the park
         '''
         ## create point of interest
         point = shapely.geometry.Point(float(photo['longitude']), float(photo['latitude']))
@@ -121,27 +164,41 @@ class Park():
         The map includes the park boundaries (blue), the park bounding box (red), and the park center (pin).
         '''
         ## create map
-        m = folium.Map(location=[self.latitude, self.longitude])
-        ## add boundaries
+        start_coords = (self.latitude, self.longitude)
+        folium_map = folium.Map(
+            location=start_coords,
+            tiles='OpenStreetMap',
+        )
+        folium_map.fit_bounds(self.get_sw_ne())
+
+        style_function = lambda x: {'fillColor': '#960808','fillOpacity': 0.1,'weight': 1.5, 'color':'#079305'}
+        ## add park contour
         folium.GeoJson(
             self.boundaries,
-            name='geojson'
-            ).add_to(m)
-        ## add bounding box
-        folium.Rectangle(
-            bounds=self.__get_bbox_points(),
-                 color='#ff7800',
-                 fill=False,
-                 fill_opacity=0.2
-                 ).add_to(m)
-        ## add marker
-        folium.Marker([self.latitude, self.longitude], popup=self.parkname, tooltip=self.parkname).add_to(m)
-        folium.LayerControl().add_to(m)
-        return m
+            name='geojson',
+            style_function=style_function
+            ).add_to(folium_map)
+
+        ## add markers
+        for i, row in self.clusters.iterrows():
+            if i<20:
+                icon_path = "./app/static/img/" + str(i+1) + ".png"
+                if i<9:
+                    size=(18,30)
+                else:
+                    size=(25,30)
+
+                html = """<a href="{{ url_for('gallery') }}"> <button type="button" class="btn btn-primary">Small button</button></a>"""
+                popup = folium.Popup(html)
+
+                icon = folium.features.CustomIcon(icon_image=icon_path ,icon_size=size, icon_anchor=(size[0]//2, size[1]))
+                folium.Marker([row['latitude'], row['longitude']], icon=icon).add_to(folium_map)
+        
+        return folium_map
 
     def __get_bbox_points(self):
         '''
-        Returns a list of four turples corresponding to the four corners of the park bounding box.
+        Returns a list of four tuples corresponding to the four corners of the park bounding box.
         [(T, L), (T, R), (B, R), (B, L)
         '''
         ## compute locations of the 4 corners
@@ -152,16 +209,28 @@ class Park():
         return [upper_left, upper_right, lower_right, lower_left]
 
     def get_bbox_string(self):
+        '''
+        Format bbox coordinates by concatenation of the coordinates using a comma.
+        '''
         return ', '.join([str(x) for x in self.bbox.values()])
 
     def __get_tolerance(self):
+        '''
+        Create a tolerance parameter used to estimate whether a photo was taken within the boundaries of the park.
+
+        Output:
+            float = min(park length (lat), park length (lon)) / 500
+        '''
         lat_diff = self.bbox['max_latitude']-self.bbox['min_latitude']
         lon_diff = self.bbox['max_longitude']-self.bbox['min_longitude']
         return min(lat_diff, lon_diff) / 500.
 
     def get_photos(self):
         '''
-        Queries photos of park from database
+        Queries photos of park from database.
+
+        Output:
+            pandas Dataframe containing all photos taken whithin the boundaries of the park.
         '''
         query = {
             'parkunit': self.parkunit,
@@ -173,6 +242,37 @@ class Park():
         df = df.set_index('id', drop=True)
 
         return df
+
+    def get_top_photos(self, cluster_id, n_photos=50):
+        '''
+        Return the n_photos belonging to specified cluster sampled amongst the 500 most recent photos.
+
+        Inputs:
+            cluster_id (int) unique id of selected cluster
+            n_photos (int) number of photos to be fetched
+        Outputs:
+            dictionary containing the information of the selected photos
+        '''
+        ## query MongoDB
+        query = usnp.db.photos.find({
+            "$and": [
+                {'parkunit':self.parkunit},
+                {'labels':cluster_id}
+                ]
+            }).sort('dateupload', pymongo.DESCENDING).limit(500)
+
+        ## create dataframe
+        photos = list(query)
+        df = pd.DataFrame(photos)
+
+        ## random sample
+        df = df.sample(n=min(n_photos,500), random_state=42)
+
+        ## create url
+        df = df.set_index('id', drop=True)
+        df['url'] = "https://farm" + df['farm'].astype('str') + ".staticflickr.com/" + df['server'].astype('str')+"/"+df.index.astype('str')+"_"+df['secret']+".jpg"
+
+        return df.to_dict('records')
 
     def get_photo_count(self):
         '''
@@ -207,7 +307,7 @@ class Park():
 
     def __get_clusters(self):
         '''
-        Queries cluster information
+        Queries information of all clusters of the park.
         '''
         query = {
             'parkunit': self.parkunit,
@@ -216,3 +316,193 @@ class Park():
         clusters = list(usnp.db.clusters.find(query))
         df = pd.DataFrame(clusters)
         return df
+
+    def convert_cluster_rank_to_id(self, rank):
+        '''
+        Convert a cluster rank into the cluster id.
+
+        Input:
+            rank (int) rank of the desired cluster
+        Output:
+            id (int) unique identifier for the selected cluster
+        '''
+        return self.clusters.query('rank=='+ str(rank))['labels'].values[0]
+
+    def get_cluster_photos(self, cluster_rank):
+        '''
+        Queries photos of park from database.
+
+        Input:
+            cluster_rank (int) rank of the selected cluster
+        Output:
+            dataframe containing the cluster photos
+        '''
+        ## fetch cluster id
+        cluster_id = self.convert_cluster_rank_to_id(cluster_rank)
+
+        ## fetch photos associated to cluster
+        query = {
+            'parkunit': self.parkunit,
+            'labels': int(cluster_id)
+        }
+        photos = list(usnp.db.photos.find(query))
+        
+        ## convert storage to dataframe
+        df = pd.DataFrame(photos)
+        df = df.set_index('id', drop=True)
+
+        return df
+
+    def get_top_tags(self, cluster_rank, top_count=20):
+        '''
+        Returns the most common tag for the selected cluster using tf-idf.
+
+        Input:
+            cluster_rank (int) rank of the selected cluster to explore
+            top_count (int) number of tags to return
+        Output:
+            dictionary of top tags
+                keys: (string) tags
+                values: (float) tf-idf
+        '''
+        ## compute tf-idf
+        tf_idf = self.tf_idf(cluster_rank)
+
+        return sorted(tf_idf(1).items(), key=lambda x: x[1],reverse=False)[0:top_count]
+
+    def get_idf(self):
+        '''
+        Returns the Inverse Document Frequency of all the tags assciated to a park.
+
+        Output:
+            dictionary of idf
+                key = tag
+                value = idf
+        '''
+        ## get all photos
+        df_all_photos = self.get_photos()
+
+        ## cluster (document) count
+        N = df_all_photos['labels'].nunique()
+
+        ## find document occurrence
+        df = {}
+
+        ## cluster ids
+        clusters = df_all_photos['labels'].unique()
+
+        ## loop over each cluster and establish document occurrence
+        for i in clusters:
+            
+            ## store unique tags
+            word_set = set()
+            for i, row in df_all_photos[(df_all_photos['labels']==i) & ~(df_all_photos['tags'].isnull())].iterrows():
+                
+                ## split tag list
+                tag_list = row['tags'].split(' ')
+                for tag in tag_list:
+                    word_set.add(tag)
+
+            for w in word_set:
+                if w in df.keys():
+                    df[w] += 1
+                else:
+                    df[w] = 1
+
+        ## compute idf
+        for k, v in df.items():
+            df[k] = N / float(df[k])
+
+        return df
+
+    def get_tf(self, cluster_rank, method='term frequency', K=0.5, max_df=0.007):
+        '''
+        Computes term frequency of the photo tags whithin a cluster.
+
+        Inputs:
+            cluster_rank (int)
+            method (string)
+                term frequency 
+                log normalization
+                double normalization
+                double normalization K
+            K (optional, int) normalization factor
+        Output:
+            dictionary of term-frequencies
+                keys: tag (string)
+                values: tf (float)
+        '''
+
+        ## retrieve cluster photos
+        df = self.get_cluster_photos(cluster_rank)
+
+        ## storage and counter
+        tag_counters = {}
+        total = 0
+        for i, row in df[df['tags'].notnull()].iterrows():
+
+            ## create tag list
+            tag_list = row['tags'].split(' ')
+
+            if tag_list:
+                for tag in tag_list:
+                    if tag in tag_counters.keys():
+                        tag_counters[tag] +=1
+                    else:
+                        tag_counters[tag] = 1
+
+        ## count number of tags (used for frequency computation)
+        total = sum([x for x in tag_counters.values()])
+
+        ## clear when df is too high
+        to_delete = []
+        for k, v in tag_counters.items():
+            if v / float(total) >= max_df:
+                to_delete.append(k)
+
+        ## clear tags with high frequency
+        for k in to_delete:
+            del tag_counters[k  ]
+
+        total = sum([x for x in tag_counters.values()])
+
+        if method == 'term frequency':
+            for k, v in tag_counters.items():
+                tag_counters[k] /= total
+
+        elif method == 'log normalization':
+            for k, v in tag_counters.items():
+                tag_counters[k] = np.log(1 + tag_counters[k])
+
+        elif method == 'double normalization':
+            max_f = float(max([x for x in tag_counters.values()]))
+            for k, v in tag_counters.items():
+                tag_counters[k] = 0.5 + 0.5 * tag_counters[k] / max_f
+
+        elif method == 'double normalization K':
+            max_f = float(max([x for x in tag_counters.values()]))
+            for k, v in tag_counters.items():
+                tag_counters[k] = K + (1 - K) * tag_counters[k] / max_f
+
+        return tag_counters
+
+    def tf_idf(self, cluster_rank):
+        '''
+        Compute tf-idf for the selected cluster rank.
+
+        Input:
+            cluster_rank (int) rank of the cluster to be explored
+        Output:
+            dictionary of tf-idf values
+                keys: tags (string)
+                values: tf-idf (float)
+        '''
+        tf = self.get_tf(cluster_rank, method='double normalization')
+
+        # tf_idf storage
+        tf_idf = {}
+
+        for k in tf.keys():
+            tf_idf[k] = tf[k] * np.log(float(self.idf[k]))
+
+        return tf_idf

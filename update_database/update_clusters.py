@@ -14,12 +14,10 @@ import json
 import glob
 
 def create_clusters(verbose=True, erase=True):
-
     '''
     Read image data from MongoDB, for each park perform DBSCAN with hyper-parameter tuning.
     Save csv files (clusters, dbscan, photos)
     '''
-
     ## create database clients
     DB = database.DB()
 
@@ -91,29 +89,6 @@ def create_clusters(verbose=True, erase=True):
         else:
             if verbose:
                 print("...data already exists for " + parkunit)
-
-    ## compile info
-    #df_photos = pd.concat(data_photos, axis=0, ignore_index=True)
-    #df_dbscan = pd.DataFrame(data_dbscan)
-    #df_clusters = pd.concat(data_clusters, axis=0, ignore_index=True)
-    #del df_clusters['index']
-#
-    ### format dataframe into dictionary
-    #df_photos = df_photos.to_dict(orient='records') 
-    #df_dbscan = df_dbscan.to_dict(orient='records') 
-    #df_clusters = df_clusters.to_dict(orient='records') 
-#
-    ### clear existing content
-    #DB.photos.delete_many({})
-    #DB.clusters.delete_many({})
-    #DB.dbscan.delete_many({})
-#
-    ### update database
-    #DB.photos.insert_many(df_photos)
-    #DB.clusters.insert_many(df_clusters)
-    #DB.dbscan.insert_many(df_dbscan)
-#
-    #print("...Clusters created")
 
 def update_database_clusters():
     

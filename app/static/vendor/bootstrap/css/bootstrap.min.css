@@ -77,7 +77,8 @@ body {
     line-height: 1.5;
     color: #212529;
     text-align: left;
-    background-color: #fff
+    background-color: #fff;
+    height: 100%
 }
 
 [tabindex="-1"]:focus {
@@ -622,10 +623,10 @@ pre code {
 
 .container {
     width: 100%;
-    padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto
+    padding-right: 10px;
+    padding-left: 10px;
+    margin-right: 10px;
+    margin-left: 10px
 }
 
 @media (min-width:576px) {
@@ -642,13 +643,13 @@ pre code {
 
 @media (min-width:992px) {
     .container {
-        max-width: 1080px
+        max-width: 100%
     }
 }
 
 @media (min-width:1200px) {
     .container {
-        max-width: 1140px
+        max-width: 100%
     }
 }
 
@@ -6170,8 +6171,11 @@ button.close {
 .carousel {
     position: relative;
     margin: 1%;
-    width: 100%;
+    width: 60%;
+    margin-left: 20%;
+    margin-top: 19px;
     background-color: #171a1d;
+    height: 550px;
 }
 
 .carousel-inner {
@@ -9231,7 +9235,8 @@ a.text-dark:hover {
 }
 
 .text-muted {
-    color: #6c757d!important
+    color: #6c757d!important;
+    font-size: 1.5rem;
 }
 
 .text-hide {

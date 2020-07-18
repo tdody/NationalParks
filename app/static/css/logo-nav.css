@@ -6,6 +6,7 @@
 
 body {
     padding-top: 54px;
+    height: 100%;
 }
 
 @media (min-width: 992px) {
@@ -105,4 +106,19 @@ img {
 
 img.icon {
     vertical-align: bottom;
+}
+
+#wrap {
+    width: 600px;
+    margin: 0 auto;
+}
+
+#left_col {
+    float: left;
+    width: 300px;
+}
+
+#right_col {
+    float: right;
+    width: 300px;
 }

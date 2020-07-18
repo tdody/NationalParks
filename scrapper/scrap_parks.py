@@ -133,7 +133,6 @@ def get_photo_count(parkunit):
     df = pd.DataFrame(photos)
     return df._id.count()
 
-
 def get_geojson(parkunit):
     path = '../scrapper/data/geojson/' + parkunit + '.geojson'
     if os.path.exists(path):
