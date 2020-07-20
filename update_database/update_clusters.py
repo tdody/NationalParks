@@ -5,6 +5,7 @@ Updates Cluster Database
 import os, sys
 sys.path.append('..')
 
+import nationalparks as usnp
 from nationalparks import database
 from nationalparks import clusters
 from nationalparks import parks
@@ -38,16 +39,19 @@ def create_clusters(verbose=True, erase=True):
         os.mkdir(photo_path)
 
     ## train DBSCAN for each park
-    for parkunit in parks.Parks().get_all_parkunits():
+    for parkunit in usnp.Parks().get_all_parkunits():
 
         ## check if data already exists
         train_dbscan = False
-        if not os.path.exists(os.path.join(cluster_path, parkunit + '.csv')):
+        if erase:
             train_dbscan = True
-        if not os.path.exists(os.path.join(dbscan_path, parkunit + '.csv')):
-            train_dbscan = True
-        if not os.path.exists(os.path.join(photo_path, parkunit + '.csv')):
-            train_dbscan = True
+        else:
+            if not os.path.exists(os.path.join(cluster_path, parkunit + '.csv')):
+                train_dbscan = True
+            if not os.path.exists(os.path.join(dbscan_path, parkunit + '.csv')):
+                train_dbscan = True
+            if not os.path.exists(os.path.join(photo_path, parkunit + '.csv')):
+                train_dbscan = True
 
         if train_dbscan:
 
@@ -91,6 +95,9 @@ def create_clusters(verbose=True, erase=True):
                 print("...data already exists for " + parkunit)
 
 def update_database_clusters():
+    '''
+    Update MongoDB tables (clusters, photos, dbscan)
+    '''
     
     ## create database clients
     DB = database.DB()

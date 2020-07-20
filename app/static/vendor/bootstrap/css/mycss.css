@@ -19,13 +19,13 @@
     text-align: left;
     vertical-align: top;
     width: 25%;
-    border: 1px solid black;
+    border: 0px solid black;
 }
 
 .columnmiddle {
     display: inline-block;
     width: 50%;
-    border: 1px solid black;
+    border: 0px solid black;
 }
 
 .carousel {
@@ -62,4 +62,13 @@
     top: 50vh;
     height: 47vh;
     margin-top: 10px;
+}
+
+span.tag {
+    background-color: #7eb88f;
+    color: white;
+    padding: 0.5em 1.01em;
+    text-decoration: none;
+    font-size: 12px;
+    line-height: 2.5em;
 }

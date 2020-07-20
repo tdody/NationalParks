@@ -14,7 +14,7 @@ class Clusters():
     '''
 
     def __init__(self, parkunit):
-        self.park = usnp.parks.Park(parkunit)
+        self.park = usnp.Park(parkunit)
 
     def train_DBSCAN(self, verbose=True):
         '''
@@ -50,10 +50,10 @@ class Clusters():
             min_cluster_count = 5
             max_cluster_count = 50
         elif df_geo.shape[0]<=10000:
-            min_cluster_count= 30
+            min_cluster_count= 10
             max_cluster_count = 500
         else:
-            min_cluster_count = 40
+            min_cluster_count = 10
             max_cluster_count = 500
 
         for i in range_eps:

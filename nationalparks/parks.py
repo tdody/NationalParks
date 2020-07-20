@@ -13,6 +13,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 import numpy as np
+import re
 
 class Parks():
     """
@@ -90,6 +91,9 @@ class Park():
     
         ## clusters
         self.clusters = self.__get_clusters()
+
+        ## dbscan
+        self.dbscan = self.get_dbscan()
 
         ## idf
         self.idf = self.get_idf()
@@ -182,8 +186,8 @@ class Park():
         ## add markers
         for i, row in self.clusters.iterrows():
             if i<20:
-                icon_path = "./app/static/img/" + str(i+1) + ".png"
-                if i<9:
+                icon_path = "./app/static/img/" + str(row['rank']) + ".png"
+                if row['rank']<=9:
                     size=(18,30)
                 else:
                     size=(25,30)
@@ -243,6 +247,23 @@ class Park():
 
         return df
 
+    def get_dbscan(self):
+        '''
+        Queries DBSCAN of park from database.
+
+        Output:
+            Dictionary containing DBSCAN information.
+        '''
+        query = {
+            'parkunit': self.parkunit,
+        }
+
+        photos = list(usnp.db.dbscan.find(query))
+        
+        dbscan = pd.DataFrame(photos).to_dict()
+
+        return dbscan
+
     def get_top_photos(self, cluster_id, n_photos=50):
         '''
         Return the n_photos belonging to specified cluster sampled amongst the 500 most recent photos.
@@ -266,7 +287,8 @@ class Park():
         df = pd.DataFrame(photos)
 
         ## random sample
-        df = df.sample(n=min(n_photos,500), random_state=42)
+        df = df.sample(n=min(n_photos,500))
+        df['title'] = df['title'].fillna("")
 
         ## create url
         df = df.set_index('id', drop=True)
@@ -286,7 +308,7 @@ class Park():
         '''
 
         ## create figure
-        fig, ax = plt.subplots(figsize=(12,12))
+        fig, ax = plt.subplots(figsize=(12,16))
 
         ## get geojson data
         df_boundaries = gpd.read_file(os.path.join('../scrapper/data/geojson', self.parkunit + '.geojson'))
@@ -296,12 +318,47 @@ class Park():
         df_photos = self.get_photos()
         top_labels = set(pd.Series(df_photos['labels']).value_counts().index.to_list())
 
+        ## mapping label id with label rank
+        df_labels = df_photos.groupby(['labels']).count()[['_id']].sort_values(['_id'],ascending=False).reset_index()
+        df_labels.index +=1
+        df_labels.index = "Rank:" + df_labels.index.astype(str) + " (" + df_labels['_id'].astype(str) + " photos)"
+        mapping = {v:k for k,v in df_labels['labels'].to_dict().items()}
+
+        df_photos['Cluster'] = df_photos['labels'].map(mapping)
+        df_photos['rank'] = df_photos['Cluster'].str.extract('(\d+)\ \(').astype(int)
+
+        df_photos = df_photos.sort_values(['rank'])
+
+        flatui = ["#9b59b6", "#3498db", "#e74c3c",(0.4, 0.7607843137254902, 0.6470588235294118),
+              (0.9882352941176471, 0.5529411764705883, 0.3843137254901961),
+              (0.5529411764705883, 0.6274509803921569, 0.796078431372549),
+              (0.9058823529411765, 0.5411764705882353, 0.7647058823529411),
+              (0.6509803921568628, 0.8470588235294118, 0.32941176470588235),
+              (1.0, 0.8509803921568627, 0.1843137254901961),
+              (0.8980392156862745, 0.7686274509803922, 0.5803921568627451),
+              (0.7019607843137254, 0.7019607843137254, 0.7019607843137254),
+              (0.5019607843137255, 0.0, 0.5019607843137255),
+              (0.0, 0.0, 0.5019607843137255),
+              (0.7284890426758939, 0.15501730103806227, 0.1973856209150327),
+              (0.21568627450980393, 0.47058823529411764, 0.7490196078431373),
+              (0.996078431372549, 0.7019607843137254, 0.03137254901960784),
+              (0.4823529411764706, 0.6980392156862745, 0.4549019607843137),
+              (0.5098039215686274, 0.37254901960784315, 0.5294117647058824),
+              (0.6423044349219739, 0.5497680051256467, 0.9582651433656727),
+              (0.9603888539940703, 0.3814317878772117, 0.8683117650835491)]
+
+        palette = sns.color_palette(flatui)
+
         ## plot photos
-        if color_clusters:
-            sns.scatterplot(x='longitude', y='latitude', data=df_photos, hue='labels', alpha=0.3, linewidth=0, palette=sns.color_palette("muted", n_colors=len(top_labels)))
+        if color_clusters:            
+            sns.scatterplot(x='longitude', y='latitude', data=df_photos, hue='Cluster', alpha=0.3, linewidth=0, palette=palette[0:len(top_labels)])
         else:
             sns.scatterplot(x='longitude', y='latitude', data=df_photos, alpha=0.1, linewidth=0, ax=ax)
-        ax.set_title(self.parkname + ": {} photos".format(df_photos.shape[0]))
+        ax.set_title(self.parkname + ": {} photos".format(df_photos.shape[0]), fontsize=15)
+
+        plt.axis('off')
+
+        plt.legend(bbox_to_anchor=(1.04,1), loc="upper left",fontsize=12)
 
         return ax
 
@@ -368,7 +425,7 @@ class Park():
         ## compute tf-idf
         tf_idf = self.tf_idf(cluster_rank)
 
-        return sorted(tf_idf(1).items(), key=lambda x: x[1],reverse=False)[0:top_count]
+        return sorted(tf_idf.items(), key=lambda x: x[1],reverse=False)[0:top_count]
 
     def get_idf(self):
         '''
@@ -379,6 +436,9 @@ class Park():
                 key = tag
                 value = idf
         '''
+        ## pattern
+        pattern = re.compile("^[a-zA-Z]+$")
+
         ## get all photos
         df_all_photos = self.get_photos()
 
@@ -401,7 +461,8 @@ class Park():
                 ## split tag list
                 tag_list = row['tags'].split(' ')
                 for tag in tag_list:
-                    word_set.add(tag)
+                    if pattern.match(tag):
+                        word_set.add(tag)
 
             for w in word_set:
                 if w in df.keys():
@@ -432,6 +493,8 @@ class Park():
                 keys: tag (string)
                 values: tf (float)
         '''
+        ## pattern
+        pattern = re.compile("^[a-zA-Z]+$")
 
         ## retrieve cluster photos
         df = self.get_cluster_photos(cluster_rank)
@@ -443,6 +506,7 @@ class Park():
 
             ## create tag list
             tag_list = row['tags'].split(' ')
+            tag_list = [x for x in tag_list if pattern.match(x)]
 
             if tag_list:
                 for tag in tag_list:
@@ -465,6 +529,9 @@ class Park():
             del tag_counters[k  ]
 
         total = sum([x for x in tag_counters.values()])
+
+        if tag_counters == {}:
+            return {}
 
         if method == 'term frequency':
             for k, v in tag_counters.items():

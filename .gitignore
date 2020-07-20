@@ -17,3 +17,6 @@ env
 */__pycache__
 */.ipynb_checkpoints/
 ./data/*
+backups
+logs
+notbooks

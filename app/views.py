@@ -67,6 +67,10 @@ def explore_park():
     ## photos
     photos = park.get_top_photos(int(cluster_id), n_photos=25)
 
+    ## tf-idf
+    tf_idf = park.get_top_tags(cluster_rank,top_count=20)
+    tags = [x[0] for x in tf_idf]
+
     return render_template(
         "explore.html",
         parkname=parkname,
@@ -80,7 +84,8 @@ def explore_park():
         message=message,
         form=form,
         samples=photos,
-        cluster_rank=cluster_rank)
+        cluster_rank=cluster_rank,
+        tags=tags)
 
 @app.route('/update_cluster', methods=['GET','POST'])
 def update_cluster():
@@ -120,6 +125,10 @@ def update_cluster():
     ## photos
     photos = park.get_top_photos(int(cluster_id), n_photos=25)
 
+    ## tf-idf
+    tf_idf = park.get_top_tags(cluster_rank,top_count=20)
+    tags = [x[0] for x in tf_idf]
+
     return render_template(
         "explore.html",
         parkname=parkname,
@@ -133,7 +142,8 @@ def update_cluster():
         message=message,
         form=form,
         samples=photos,
-        cluster_rank=cluster_rank)
+        cluster_rank=cluster_rank,
+        tags=tags)
 
 @app.route('/gallery')
 def gallery():
@@ -141,7 +151,15 @@ def gallery():
 
 @app.route('/about')
 def about():
-    return render_template("about.html", message="")
+    return render_template("about.html")
+
+@app.route('/model')
+def model():
+    return render_template("model.html")
+
+@app.route('/contact')
+def contact():
+    return render_template("contact.html")
 
 @app.route('/_autocomplete',methods=['GET'])
 def autocomplete():
