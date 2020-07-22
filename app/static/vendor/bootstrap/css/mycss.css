@@ -72,3 +72,49 @@ span.tag {
     font-size: 12px;
     line-height: 2.5em;
 }
+
+.app {
+    margin-left: 50px;
+    margin-right: 50px;
+    padding-top: 80px;
+    display: grid;
+    grid-gap: 15px;
+    grid-template-columns: repeat(auto-fit, 300px);
+    border: 1px black;
+    font-size: 15px;
+    left: 50%;
+    right: 50%;
+    display: grid;
+    justify-content: center;
+    align-content: center;
+}
+
+
+/* Container holding the image and the text */
+
+.tile {
+    position: relative;
+}
+
+
+/* Bottom right text */
+
+img.tile {
+    border-radius: 10%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+}
+
+.tile-text {
+    font-size: 20px;
+    margin: 0 0 -2px;
+    color: #fff;
+    line-height: 1.2;
+    position: absolute;
+    font-family: Muli, sans-serif;
+    bottom: 0px;
+    left: 20px;
+    color: white;
+    padding-left: 5px;
+    padding-right: 5px;
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.356)
+}

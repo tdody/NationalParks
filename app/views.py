@@ -155,7 +155,9 @@ def about():
 
 @app.route('/model')
 def model():
-    return render_template("model.html")
+    parkunits = usnp.Parks().get_all_parkunits()
+    parkunits = ["img/tiles/resize/" + parkunit + ".jpg" for parkunit in parkunits]
+    return render_template("model.html", parkunits=parkunits)
 
 @app.route('/contact')
 def contact():
