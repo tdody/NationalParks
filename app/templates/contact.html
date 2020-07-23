@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block content %}
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a href="{{ url_for('home') }}">
+            <img src="{{ url_for('static', filename='img/icon/medium.png') }}" width="30" alt=""></a>
+        <h1><span style="color: rgb(11, 75, 79)">&nbsp;&nbsp;&nbsp;usparks</span><span style="color: #dd872a">.io</span></h1>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive" style="font-size: 20px;">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('model') }}">Model</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
+                    <span class="sr-only">(current)</span></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container" style="padding-left: 100px;padding-right: 100px;padding-top: 50px">
+    <h2 style="padding-top: 60px;">About</h2>
+    <p style="font-size: 12px;"><img src="https://tdody.github.io/assets/img/Personal.png" style="float:left;width:191px;height:280px;padding-right:20px;"> My name is Thibault Dody.<br><br>I am a lead engineer with a strong background in mathematics. My current work focuses on performing
+        risk analysis for nuclear power plants, I also work on software development. We perform probability risk assessment related to external aggressions such as seismic, tornado missiles or floods.<br><br> I completed my <b>MEng</b> at MIT with a
+        <a href="https://dspace.mit.edu/handle/1721.1/82709" target="_blank">
+             thesis 
+        </a> focused on applying numerical optimization techniques to reduce the impact of earthquakes on buildings. Before joining the MIT program, I studied mathematics and physics as part of the preparatory
+        <a href="https://en.wikipedia.org/wiki/Classe_pr%C3%A9paratoire_aux_grandes_%C3%A9coles" target="_blank">
+             program 
+        </a> to enter French engineering schools, I then joined the <b>MSc</b> program at the
+        <a href="https://www.estp.fr/en" target="_blank">
+             ESTP 
+        </a> school in Paris to study structural engineering with a strong emphasis on mathematics.<br>
+        <br> You can read more about my past
+        <a href="https://tdody.github.io/projects/" target="_blank">
+             projects 
+        </a> or obtain a copy of my
+        <a href="http://tdody.github.io/docs/DodyResume.pdf" target="_blank">
+             CV 
+        </a>.
+        <br clear="left"></p>
+</div>
+{% endblock %}

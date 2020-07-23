@@ -186,7 +186,7 @@ class Park():
         ## add markers
         for i, row in self.clusters.iterrows():
             if i<20:
-                icon_path = "./app/static/img/" + str(row['rank']) + ".png"
+                icon_path = "./app/static/img/markers/" + str(row['rank']) + ".png"
                 if row['rank']<=9:
                     size=(18,30)
                 else:
