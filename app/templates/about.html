@@ -61,7 +61,7 @@
             In order to identify the most visited locations, we used Density-Based Spatial Clustering of Applications with Noise (DBSCAN). The longitude and latitude of each photograph are used to cluster the photos. The DBSCAN algorithm takes two parameters. The
             first one in the maximum distance used to search neighbors and the second one is the minimum number of neighbors to be contained within the maximum distance to be considered a cluster.
             <br><br> As depicted on the image on the right, two clusters were obtained from the photo distribution with a minimum samples equal to 3. With four photos, cluster 1 is the most visited location. The two images on the top-right were not clustered
-            because they do not meet the minimum sample requirement. The single phot on the bottom right is not assigned to any cluster as it is too isolated.
+            because they do not meet the minimum sample requirement. The single photo on the bottom right is not assigned to any cluster as it is too isolated.
             <br><br>In order to find the best parameters, we define a metric of interest called the silhouette score.
             <br><br>For a data point $i \in C_{i}$ (data point $i$ in the cluster $C_{i}$), let $$a(i) = \frac{1}{|C_i| - 1} \sum_{j \in C_i, i \neq j} d(i, j)$$ </div>
         <div class=" model_col_third"><img src="{{ url_for('static', filename='/img/misc/clustering.png') }}" style="width: 100%;padding-left: 20px;"></div>
