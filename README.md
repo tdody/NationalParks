@@ -1,3 +1,4 @@
+![Yellowstone](https://github.com/tdody/NationalParks/blob/master/app/static/img/icon/banner.jpg)
 # NationalParks
 
 ## Motivation
