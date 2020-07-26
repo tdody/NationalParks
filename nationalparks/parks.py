@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import re
+import matplotlib.cm as cm
+from sklearn.metrics import silhouette_samples, silhouette_score
 
 class Parks():
     """
@@ -91,6 +93,7 @@ class Park():
     
         ## clusters
         self.clusters = self.__get_clusters()
+        self.cluster_count = len(self.clusters)
 
         ## dbscan
         self.dbscan = self.get_dbscan()
@@ -244,6 +247,10 @@ class Park():
         
         df = pd.DataFrame(photos)
         df = df.set_index('id', drop=True)
+
+        df['latitude'] = df['latitude'].astype(float)
+        df['longitude'] = df['longitude'].astype(float)
+        df['dateupload'] = df['longitude'].astype(int)
 
         return df
 
@@ -573,3 +580,90 @@ class Park():
             tf_idf[k] = tf[k] * np.log(float(self.idf[k]))
 
         return tf_idf
+
+    def plot_silhouette_scores(self):
+        '''
+        Return the silhouette score distribution of the clustering.
+        '''
+
+        ## get photos and top labels
+        df_photos = self.get_photos()
+        top_labels = set(pd.Series(df_photos['labels']).value_counts().index.to_list())
+
+        ## mapping label id with label rank
+        df_labels = df_photos.groupby(['labels']).count()[['_id']].sort_values(['_id'],ascending=False).reset_index()
+        df_labels.index +=1
+        df_labels.index = "Rank:" + df_labels.index.astype(str) + " (" + df_labels['_id'].astype(str) + " photos)"
+        mapping = {v:k for k,v in df_labels['labels'].to_dict().items()}
+
+        ## create cluster and rank features
+        df_photos['Cluster'] = df_photos['labels'].map(mapping)
+        df_photos['rank'] = df_photos['Cluster'].str.extract('(\d+)\ \(').astype(int)
+
+        ## extract coordinates to be used to compute the silhouette score
+        X = df_photos[['latitude','longitude']]
+        cluster_labels = df_photos['rank']
+        n_clusters = cluster_labels.nunique()
+
+        flatui = ["#9b59b6", "#3498db", "#e74c3c",(0.4, 0.7607843137254902, 0.6470588235294118),
+                      (0.9882352941176471, 0.5529411764705883, 0.3843137254901961),
+                      (0.5529411764705883, 0.6274509803921569, 0.796078431372549),
+                      (0.9058823529411765, 0.5411764705882353, 0.7647058823529411),
+                      (0.6509803921568628, 0.8470588235294118, 0.32941176470588235),
+                      (1.0, 0.8509803921568627, 0.1843137254901961),
+                      (0.8980392156862745, 0.7686274509803922, 0.5803921568627451),
+                      (0.7019607843137254, 0.7019607843137254, 0.7019607843137254),
+                      (0.5019607843137255, 0.0, 0.5019607843137255),
+                      (0.0, 0.0, 0.5019607843137255),
+                      (0.7284890426758939, 0.15501730103806227, 0.1973856209150327),
+                      (0.21568627450980393, 0.47058823529411764, 0.7490196078431373),
+                      (0.996078431372549, 0.7019607843137254, 0.03137254901960784),
+                      (0.4823529411764706, 0.6980392156862745, 0.4549019607843137),
+                      (0.5098039215686274, 0.37254901960784315, 0.5294117647058824),
+                      (0.6423044349219739, 0.5497680051256467, 0.9582651433656727),
+                      (0.9603888539940703, 0.3814317878772117, 0.8683117650835491)]
+
+        ## create a subplot with 1 row and 2 columns
+        fig, ax = plt.subplots()
+        fig.set_size_inches(7, 7)
+        ax.set_xlim([-1, 1])
+
+        ## the (n_clusters+1)*10 is for inserting blank space between silhouette
+        ## plots of individual clusters, to demarcate them clearly.
+        ax.set_ylim([0, len(X) + (n_clusters + 1) * 10])
+
+        ## compute the silhouette scores for each sample
+        sample_silhouette_values = silhouette_samples(X, cluster_labels)
+        silhouette_avg = silhouette_score(X, cluster_labels)
+
+        y_lower = 10
+        for i in range(1, n_clusters+1):
+            ## aggregate the silhouette scores for samples belonging to
+            ## cluster i, and sort them
+            ith_cluster_silhouette_values = \
+                sample_silhouette_values[cluster_labels == i]
+
+            ith_cluster_silhouette_values.sort()
+
+            size_cluster_i = ith_cluster_silhouette_values.shape[0]
+            y_upper = y_lower + size_cluster_i
+
+            color = flatui[i-1]
+            ax.fill_betweenx(np.arange(y_lower, y_upper),
+                              0, ith_cluster_silhouette_values,
+                              facecolor=color, edgecolor=color, alpha=0.7)
+
+
+            ## compute the new y_lower for next plot
+            y_lower = y_upper + 10  # 10 for the 0 samples
+
+        ax.set_title("The silhouette plot for the clusters.")
+        ax.set_xlabel("silhouette values")
+        ax.set_ylabel("cluster label")
+
+        ## the vertical line for average silhouette score of all the values
+        ax.axvline(x=silhouette_avg, color="red", linestyle="--")
+
+        ax.set_yticks([])  # Clear the yaxis labels / ticks
+
+        return ax

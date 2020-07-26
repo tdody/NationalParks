@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block content %}
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container" sty>
+        <a href="{{ url_for('home') }}">
+            <img src="{{ url_for('static', filename='img/icon/medium.png') }}" width="30" alt=""></a>
+        <h1><span style="color: rgb(11, 75, 79)">&nbsp;&nbsp;&nbsp;usparks</span><span style="color: #dd872a">.io</span></h1>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive" style="font-size: 20px;">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="{{ url_for('model') }}">Model</a>
+                    <span class="sr-only">(current)</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div style="margin-top: 65px;padding-left: 100px;padding-right: 100px;font-size: 13px;">
+    <h1 style="font-size: 20px;">&nbsp;{{ park.parkname }} - Model
+    </h1>
+    <br>
+    <div><b>&nbsp;State:</b> {{ park.state }}</div>
+    <div><b>&nbsp;# Photos:</b> {{ park.photo_count }}</div>
+    <div><b>&nbsp;# Scenes:</b> {{ park.cluster_count }}</div>
+    <div><b>&nbsp;DBSCAN Results:</b> &nbsp;min_samples= {{ park.dbscan.min_samples[0] }} &nbsp;eps= {{ '{0:0.5f}'.format(park.dbscan.eps[0]) }}
+    </div>
+    <br>
+    <br>
+
+</div>
+
+<div class="model_row" style="padding-left: 25px;padding-right: 25px;margin-bottom: 30px;">
+    <div class="model_col">
+        <img src="{{ url_for('static', filename='/img/models/'+park.parkunit+'.jpg') }}" style="width: 100%;">
+    </div>
+    <div class=" model_col "><img src="{{ url_for('static', filename='/img/silhouette/'+park.parkunit+'.jpg') }}" style="width: 90%"></div>
+</div>
+
+
+{% endblock %}

@@ -161,6 +161,13 @@ def model():
         park['url'] = "img/tiles/" + park['parkunit'] + ".jpg"
     return render_template("model.html", parks=parks)
 
+@app.route('/modeldetails', methods=['GET', 'POST'])
+def model_details():
+    parkunit = request.args.get('parkunit')
+    park = usnp.db.parks.find_one({'parkunit':parkunit})
+    park = usnp.Park(parkunit)
+    return render_template("modeldetails.html", park=park)
+
 @app.route('/contact')
 def contact():
     return render_template("contact.html")

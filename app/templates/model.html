@@ -33,11 +33,13 @@
     <div class="item">
 
         <div class="tile">
-            <img class="tile" src="{{ url_for('static', filename=park.url)}}" alt="Norway" style="width:100%;">
-            <div class="tile-text">
-                <p>{{ park.parkname }}</p>
-                <p style="text-transform: uppercase; color:#d6d6d6;font-size: 14px;">{{ park.state }}</p>
-            </div>
+            <a href="{{url_for('model_details', parkunit=park.parkunit)}}">
+                <img class="tile" src="{{ url_for('static', filename=park.url)}}" style="width:100%;">
+                <div class="tile-text">
+                    <p>{{ park.parkname }}</p>
+                    <p style="text-transform: uppercase; color:#d6d6d6;font-size: 14px;">{{ park.state }}</p>
+                </div>
+            </a>
         </div>
 
 

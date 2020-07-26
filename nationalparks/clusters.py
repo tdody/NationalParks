@@ -54,8 +54,8 @@ class Clusters():
             max_cluster_count = 500
         else:
             min_cluster_count = 10
-            max_cluster_count = 500
-
+            max_cluster_count = 500        
+        
         for i in range_eps:
             if i==0:
                 continue

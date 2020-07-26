@@ -44,7 +44,7 @@
 
 .ui-widget {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 20px;
+    font-size: 15px;
 }
 
 .one,
@@ -117,4 +117,28 @@ img.tile {
     padding-left: 5px;
     padding-right: 5px;
     text-shadow: 1px 1px 4px black
+}
+
+.model_col {
+    float: left;
+    width: 50%;
+}
+
+.model_col_third {
+    float: left;
+    width: 33%;
+}
+
+.model_col_twothird {
+    float: left;
+    width: 67%;
+}
+
+
+/* Clear floats after the columns */
+
+.model_row:after {
+    content: "";
+    display: table;
+    clear: both;
 }
