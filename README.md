@@ -20,4 +20,4 @@ When a photo is uploaded by a user on Flickr, tags can be added manually to the 
 Frequency (tf-idf). This summary of the most import tags is then provided on the cluster page to help describe the location corresponding to the cluster.
 
 ## Architecture
-[Architecture](https://github.com/tdody/NationalParks/blob/master/app/static/img/misc/Architecture.png)
+![Architecture](https://github.com/tdody/NationalParks/blob/master/app/static/img/misc/Architecture.png)
