@@ -1,0 +1,144 @@
+.text-muted {
+    color: #6c757d!important;
+    font-size: 1.5rem;
+}
+
+*,
+*:after,
+*:before {
+    box-sizing: border-box;
+}
+
+.wrapper {
+    width: 100%;
+    font-size: 0px;
+}
+
+.column {
+    display: inline-block;
+    text-align: left;
+    vertical-align: top;
+    width: 25%;
+    border: 0px solid black;
+}
+
+.columnmiddle {
+    display: inline-block;
+    width: 50%;
+    border: 0px solid black;
+}
+
+.carousel {
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+}
+
+.carousel-inner {
+    background-color: white !important;
+}
+
+.carousel-inner>.item>img {
+    height: 100%;
+}
+
+.ui-widget {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+}
+
+.one,
+.two {
+    position: absolute;
+    width: 100%;
+}
+
+.one {
+    height: 50vh;
+    margin-bottom: 10px;
+}
+
+.two {
+    top: 50vh;
+    height: 47vh;
+    margin-top: 10px;
+}
+
+span.tag {
+    background-color: #7eb88f;
+    color: white;
+    padding: 0.5em 1.01em;
+    text-decoration: none;
+    font-size: 12px;
+    line-height: 2.5em;
+}
+
+.app {
+    margin-left: 50px;
+    margin-right: 50px;
+    padding-top: 80px;
+    display: grid;
+    grid-gap: 15px;
+    grid-template-columns: repeat(auto-fit, 300px);
+    border: 1px black;
+    font-size: 13px;
+    left: 50%;
+    right: 50%;
+    display: grid;
+    justify-content: center;
+    align-content: center;
+}
+
+
+/* Container holding the image and the text */
+
+.tile {
+    position: relative;
+}
+
+
+/* Bottom right text */
+
+img.tile {
+    border-radius: 10%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+}
+
+.tile-text {
+    font-size: 18px;
+    margin: 0 0 -2px;
+    color: #fff;
+    line-height: 1.2;
+    position: absolute;
+    font-family: Muli, sans-serif;
+    bottom: 0px;
+    left: 20px;
+    color: white;
+    padding-left: 5px;
+    padding-right: 5px;
+    text-shadow: 1px 1px 4px black
+}
+
+.model_col {
+    float: left;
+    width: 50%;
+}
+
+.model_col_third {
+    float: left;
+    width: 33%;
+}
+
+.model_col_twothird {
+    float: left;
+    width: 67%;
+}
+
+
+/* Clear floats after the columns */
+
+.model_row:after {
+    content: "";
+    display: table;
+    clear: both;
+}

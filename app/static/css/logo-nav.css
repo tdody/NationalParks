@@ -1,0 +1,124 @@
+/*!
+ * Start Bootstrap - Logo Nav (https://startbootstrap.com/template-overviews/logo-nav)
+ * Copyright 2013-2017 Start Bootstrap
+ * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-logo-nav/blob/master/LICENSE)
+ */
+
+body {
+    padding-top: 54px;
+    height: 100%;
+}
+
+@media (min-width: 992px) {
+    body {
+        padding-top: 0px;
+    }
+}
+
+
+/* Three image containers (use 25% for four, and 50% for two, etc) */
+
+.column {
+    float: left;
+    width: 33.33%;
+    padding: 5px;
+    text-align: center
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+.aligncenter {
+    text-align: center;
+}
+
+
+/* Clear floats after image containers */
+
+.row::after {
+    content: "";
+    clear: both;
+    display: table;
+    text-align: center;
+}
+
+table,
+td,
+th {
+    border: 1px solid #aaa;
+    text-align: center;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th {
+    height: 30px;
+}
+
+td {
+    text-align: left;
+    vertical-align: top;
+    padding: 5px;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+th.style {
+    width: 70%
+}
+
+img {
+    max-width: 100%;
+}
+
+
+/* Create two equal columns that floats next to each other */
+
+.column_custom {
+    float: left;
+    width: 50%;
+    padding: 5px;
+    height: 300px;
+    /* Should be removed. Only for demonstration */
+}
+
+.row_custom {
+    width: 100%;
+}
+
+
+/* Clear floats after the columns */
+
+.row_custom:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+img.icon {
+    vertical-align: bottom;
+}
+
+#wrap {
+    width: 600px;
+    margin: 0 auto;
+}
+
+#left_col {
+    float: left;
+    width: 300px;
+}
+
+#right_col {
+    float: right;
+    width: 300px;
+}

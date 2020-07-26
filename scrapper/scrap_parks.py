@@ -8,14 +8,16 @@ import urllib.request
 import re
 import os, sys
 import pandas as pd
+import json
 sys.path.append('..')
+import nationalparks as usnp
 from dms2dec.dms_convert import dms2dec
 
 NP_LINK = "https://en.wikipedia.org/wiki/List_of_national_parks_of_the_United_States?oldformat=true"
 
 def scrap_park_data():
     """
-    Extract National Parks data from https://en.wikipedia.org/wiki/List_of_national_parks_of_the_United_States?oldformat=true
+    Extracts National Parks data from https://en.wikipedia.org/wiki/List_of_national_parks_of_the_United_States?oldformat=true
     
     Saves a csv file containing:
         - Park name
@@ -51,6 +53,12 @@ def scrap_park_data():
         
         ## find park name
         np = tr.find_all("a")[0].get('title')
+
+        ## clean park name
+        np = np.replace('ʻ', '')
+        np = np.replace('ā', 'a')
+        np = np.replace('–', '-')
+
         parks.append(np)
         data[np] = {}
     
@@ -92,4 +100,63 @@ def scrap_park_data():
     ## create dataframe
     parks = pd.DataFrame(data).T.reset_index()
 
+    ## read park units
+    units = pd.read_csv("../scrapper/data/Parks.csv")
+    
+    ## merge
+    parks = pd.merge(left=parks, right=units, left_on='index', right_on='parkname')
+    del parks['parkname']
+
+    ## read park websites
+    websites = pd.read_csv('../scrapper/data/park_websites.csv')
+
+    ## merge
+    parks = pd.merge(left=parks, right=websites, on='parkunit')
+
+    ## count photos
+    parks['photo_count'] = parks['parkunit'].apply(get_photo_count)
+
+    ## rename columns
+    parks = parks.rename(columns={"index": "parkname"})
+
+    ## get topo
+    parks['boundaries'] = parks['parkunit'].apply(lambda x: get_geojson(x))
+    parks['bbox'] = parks['parkunit'].apply(lambda x: get_bbox(x))
+
     return parks
+
+def get_photo_count(parkunit):
+    '''
+    Return the number of photos used for the clustering
+    '''
+    photos = list(usnp.db.photos.find({'parkunit': parkunit}))
+    df = pd.DataFrame(photos)
+    return df._id.count()
+
+def get_geojson(parkunit):
+    path = '../scrapper/data/geojson/' + parkunit + '.geojson'
+    if os.path.exists(path):
+        with open(path, 'r') as file:
+            geojson = file.read().replace('\n', '')
+    else:
+        raise Exception("geojson file not found.")
+    return geojson
+
+def get_bbox(parkunit):
+    path = '../scrapper/data/topojson/' + parkunit + '.topojson'
+    if os.path.exists(path):
+        with open(path, 'r') as file:
+            topojson = file.read()
+            topojson = json.loads(topojson)
+            bbox = {
+                'min_longitude':topojson['bbox'][0],
+                'min_latitude':topojson['bbox'][1],
+                'max_longitude':topojson['bbox'][2],
+                'max_latitude':topojson['bbox'][3]
+                }
+            return bbox
+    else:
+        raise Exception("topojson file not found.")
+
+if __name__ == "__main__":
+    df = scrap_park_data()

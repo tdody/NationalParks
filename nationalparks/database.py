@@ -25,3 +25,6 @@ class DB:
         ## collections
         self.parks = self.db.parks
         self.photos = self.db.photos
+
+        self.dbscan = self.db.dbscan
+        self.clusters = self.db.clusters

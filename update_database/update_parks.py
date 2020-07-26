@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Update National Parks database
+Updates National Parks database
 """
 import os, sys
 sys.path.append('..')
 
-from nationalparks import database, logger
+from nationalparks import database
 from scrapper import scrap_parks
 
 import pandas as pd
@@ -26,12 +26,10 @@ def update_parks():
     ## update database
     ## index, state, latitude, longitude, date, surface_acres, surface_km2, visitors, description
     DB.parks.insert_many(records)
-
-    ## update log
-    logger.update_parks_database(list(df_parks.columns), df_parks.shape[0])
+    
 
 if __name__ == "__main__":
     ## update parks
     update_parks()
 
-    print("...Park data updated")
+    print("... Park data updated")
