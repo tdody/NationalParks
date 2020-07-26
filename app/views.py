@@ -68,8 +68,9 @@ def explore_park():
     photos = park.get_top_photos(int(cluster_id), n_photos=25)
 
     ## tf-idf
-    tf_idf = park.get_top_tags(cluster_rank,top_count=20)
-    tags = [x[0] for x in tf_idf]
+    tags = park.clusters[park.clusters['rank']==cluster_rank]['top_tags'].values[0]
+    if tags:
+        tags = tags.split(";")
 
     return render_template(
         "explore.html",
@@ -93,7 +94,6 @@ def update_cluster():
     results = results.split("//")
     parkname = results[0]
     cluster_rank = int(results[1])
-    print(parkname, cluster_rank)
 
     ## create park object
     parkunit = usnp.parks.parkname_to_parkunit(parkname)
@@ -126,8 +126,9 @@ def update_cluster():
     photos = park.get_top_photos(int(cluster_id), n_photos=25)
 
     ## tf-idf
-    tf_idf = park.get_top_tags(cluster_rank,top_count=20)
-    tags = [x[0] for x in tf_idf]
+    tags = park.clusters[park.clusters['rank']==cluster_rank]['top_tags'].values[0]
+    if tags:
+        tags = tags.split(";")
 
     return render_template(
         "explore.html",
