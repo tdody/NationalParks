@@ -2,12 +2,13 @@
 # NationalParks
 
 ## Motivation
-Since visiting my first ever National Park, I have been fascinated by their diversity and the unique view the offer about the natural landscapes and biodiversity of the U.S. I have since visited 5 of them and I do not plan on stopping anytime soon. Through
-this project, I wanted to combine my passion of photography and machine learning to fuel my curiosity about the parks.
+The first National Park in the United States that I visited was Congaree National Park in South Carolina in 2018. I was immediately fascinated by the natural landscape and the vast biodiversity that I saw within the park. Since that time, I have visited a total of 5 National Parks across the US and I do not plan on stopping anytime soon.
+Through this project, I will combine my passion for National Parks and machine learning to create a useful tool that will help those who wish to understand the National Park System better and explore America’s “Best Idea”.
 
 ## Goal
-Since President Ulysses S. Grant established Yellowstone as the first National Park in 1872, 61 other locations have joined the program. The National Parks are the best illustration of what the American ecosystem has to offer. Every year, the National
-Parks welcome more than 80 millions visitors. The goal of usparks.io is to transport visitors into the best locations of each park. By using machine learning and clustering techniques, the application identify the most photographed location and gives the possibility to access some of these photographs. This application can be used as a tool to help you plan your upcoming trip to a National Park or simply to give you a virtual access to the most secluded ones.
+Yellowstone National Park was established as the first National Park in 1872. Since then, 61 Parks have been added to the US National Park System. The National Parks are the best illustration of what the American ecosystem has to offer. Every year, these locations welcome more than 80 millions visitors. The goal of usparks.io is to transport visitors into the best locations of each park.
+By using machine learning and clustering techniques, the application identifies the most photographed locations and gives the user the possibility to access some of these photographs. 
+This application can be used as a tool to help you plan your upcoming trip to a National Park by showing you the most popular attractions or simply to give you virtual access to what these Parks have to offer.
 
 ## Data
 The National Parks information was retrieved from the [Wikipedia](https://en.wikipedia.org/wiki/List_of_national_parks_of_the_United_States?oldformat=true) page In order to make this project feasible, we needed access to a large dataset of geolocalized photographs. The website data was scrapped using the popular python library [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/). Once the initial information has been gathered for all 62 National Parks, the park boundaries were obtained from the official National Park Service [Website](https://www.nps.gov/planyourvisit/maps.htm). The obtained Geojson files are used to identify pictures that are taken inside each park.
