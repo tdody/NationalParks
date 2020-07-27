@@ -9,6 +9,6 @@ if __name__ == '__main__':
     args = vars(ap.parse_args())
 
     if args["debug"]:
-        app.run(debug=True, port=8000)
+        app.run(debug=True, port=8080)
     else:
-       app.run(host='0.0.0.0', threaded=True ,port=8000)
+       app.run(host='0.0.0.0', threaded=True ,port=8080)
