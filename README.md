@@ -6,7 +6,7 @@ The first National Park in the United States that I visited was Congaree Nationa
 Through this project, I will combine my passion for National Parks and machine learning to create a useful tool that will help those who wish to understand the National Park System better and explore America’s “Best Idea”.
 
 ## Goal
-Yellowstone National Park was established as the first National Park in 1872. Since then, 61 Parks have been added to the US National Park System. The National Parks are the best illustration of what the American ecosystem has to offer. Every year, these locations welcome more than 80 millions visitors. The goal of usparks.io is to transport visitors into the best locations of each park.
+Yellowstone National Park was established as the first National Park in 1872. Since then, 61 Parks have been added to the US National Park System. The National Parks are the best illustration of what the American ecosystem has to offer. Every year, these locations welcome more than 80 millions visitors. The goal of usaparks.io is to transport visitors into the best locations of each park.
 By using machine learning and clustering techniques, the application identifies the most photographed locations and gives the user the possibility to access some of these photographs. 
 This application can be used as a tool to help you plan your upcoming trip to a National Park by showing you the most popular attractions or simply to give you virtual access to what these Parks have to offer.
 
