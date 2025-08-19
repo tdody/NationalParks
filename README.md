@@ -1,6 +1,9 @@
 ![Yellowstone](https://github.com/tdody/NationalParks/blob/master/app/static/img/icon/banner.jpg)
 # NationalParks
 
+[![Watch the video](https://img.youtube.com/vi/JYDgPPAacCo/maxresdefault.jpg)](https://www.youtube.com/watch?v=JYDgPPAacCo)
+
+
 ## Motivation
 The first National Park in the United States that I visited was Congaree National Park in South Carolina in 2018. I was immediately fascinated by the natural landscape and the vast biodiversity that I saw within the park. Since that time, I have visited a total of 5 National Parks across the US and I do not plan on stopping anytime soon.
 Through this project, I will combine my passion for National Parks and machine learning to create a useful tool that will help those who wish to understand the National Park System better and explore America’s “Best Idea”.
